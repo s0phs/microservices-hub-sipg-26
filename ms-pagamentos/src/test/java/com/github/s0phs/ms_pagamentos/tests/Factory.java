@@ -8,9 +8,15 @@ import java.math.BigDecimal;
 public class Factory {
 
     public static Pagamento createPagamento(){
-        Pagamento pagamento = new Pagamento(1L, BigDecimal.valueOf(32.25),
-                "Brienne de Tarth", "3656541596582315", "07/15",
-                "354", Status.CRIADO, 1L);
+        Pagamento pagamento = new Pagamento(
+                1L,
+                BigDecimal.valueOf(32.25),
+                "Brienne de Tarth",
+                "3656541596582315",
+                "07/15",
+                "354",
+                Status.CRIADO,
+                1L);
         return pagamento;
     }
 
