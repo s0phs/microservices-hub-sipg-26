@@ -193,7 +193,7 @@ public class PagamentoControllerTest {
         Mockito.when(pagamentoService.updatePagamento(eq(existingId), any(PagamentoDTO.class)))
                                 .thenReturn(responseDTO);
 
-        mockMvc.perform(put("/pagamento/{id}", existingId)
+        mockMvc.perform(put("/pagamentos/{id}", existingId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(jsonRequestBody))
