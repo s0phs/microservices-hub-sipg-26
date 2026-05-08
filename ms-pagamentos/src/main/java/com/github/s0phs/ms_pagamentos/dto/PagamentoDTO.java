@@ -36,7 +36,7 @@ public class PagamentoDTO {
     private String validade;
 
     @NotBlank(message = "O código de segurança é requerido")
-    @Size(min = 5, max = 5, message = "Código de segurança deve ter 3 caracteres")
+    @Size(min = 3, max = 3, message = "Código de segurança deve ter 3 caracteres")
     private String codigoSeguranca;
 
     private Status status;
