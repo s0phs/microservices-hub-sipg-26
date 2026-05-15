@@ -3,6 +3,7 @@ package com.github.s0phs.ms_pagamentos.controller;
 import com.github.s0phs.ms_pagamentos.dto.PagamentoDTO;
 import com.github.s0phs.ms_pagamentos.service.PagamentoService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -62,5 +63,14 @@ public class PagamentoController {
         pagamentoService.deletePagamentoById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    //Patch faz uma modificação parcial, diferente do Put que faz uma substituição total
+    @PatchMapping("/{id}/confirmar")
+    public ResponseEntity<PagamentoDTO> confirmarPagamentoDoPedido(@PathVariable @NotNull Long id) {
+
+        PagamentoDTO dto = pagamentoService.confirmarPagamentoDoPedido(id);
+
+        return ResponseEntity.ok(dto);
     }
 }

@@ -1,10 +1,13 @@
 package com.github.s0phs.ms_pagamentos.service;
 
+import com.github.s0phs.ms_pagamentos.client.PedidoClient;
 import com.github.s0phs.ms_pagamentos.dto.PagamentoDTO;
 import com.github.s0phs.ms_pagamentos.entities.Pagamento;
 import com.github.s0phs.ms_pagamentos.entities.Status;
+import com.github.s0phs.ms_pagamentos.exceptions.PagamentoAprovadoException;
 import com.github.s0phs.ms_pagamentos.exceptions.ResourceNotFoundException;
 import com.github.s0phs.ms_pagamentos.repositories.PagamentoRepository;
+import feign.FeignException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,10 @@ public class PagamentoService {
 
     @Autowired
     private PagamentoRepository pagamentoRepository;
+
+
+    @Autowired
+    private PedidoClient pedidoClient;
 
     @Transactional(readOnly = true)
     public List<PagamentoDTO> findAllPagamentos(){
@@ -61,6 +68,11 @@ public class PagamentoService {
     public PagamentoDTO updatePagamento( Long id, PagamentoDTO pagamentoDTO){
          try {
 
+             if (pagamentoDTO.getStatus().equals(Status.APROVADO)){
+                 throw new PagamentoAprovadoException(
+                         String.format("Pagamento id %d já está ARPOVADO e não pode ser alterado", id)
+                 );
+             }
              Pagamento pagamento = pagamentoRepository.getReferenceById(id);
              copyDtoToPagamento(pagamentoDTO, pagamento);
              pagamento.setStatus(pagamentoDTO.getStatus());
@@ -81,5 +93,27 @@ public class PagamentoService {
             throw new ResourceNotFoundException("Recurso não encontrado. ID: " + id);
         }
         pagamentoRepository.deleteById(id);
+    }
+
+    ////////////////////////////////////////
+    @Transactional
+    public PagamentoDTO confirmarPagamentoDoPedido(Long id){
+        Pagamento pagamento = pagamentoRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Recurso não encontrado. ID: " + id)
+        );
+
+        pagamento.setStatus(Status.APROVADO);
+        pagamentoRepository.save(pagamento);
+
+        try {
+            pedidoClient.confirmarPagamento(pagamento.getPedidoId());
+        }catch (FeignException.NotFound e) {// 404 do ms-pedidos
+            //não existe pedido para receber a confirmação
+            throw new ResourceNotFoundException("Pedido não encontrado. ID: " + pagamento.getPedidoId());
+        }catch (FeignException e) {
+            //outros erros (400/500/timeout etc.)
+            throw new RuntimeException("Falha ao comunicar com ms-pedidos", e);
+        }
+        return new PagamentoDTO(pagamento);
     }
 }
