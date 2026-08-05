@@ -80,7 +80,7 @@ public class PedidoService {
             ////////////////
             if(pedido.getStatus().equals(Status.PAGO)){
                 throw new PedidoPagoException(
-                        String.format("Pedido id: %d já está PAGO e não pod ser alterado", id)
+                        String.format("Pedido id: %d já está PAGO e não pode ser alterado", id)
                 );
             }
             ////////////////

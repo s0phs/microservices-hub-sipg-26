@@ -70,7 +70,7 @@ public class PagamentoService {
 
              if (pagamentoDTO.getStatus().equals(Status.APROVADO)){
                  throw new PagamentoAprovadoException(
-                         String.format("Pagamento id %d já está ARPOVADO e não pode ser alterado", id)
+                         String.format("Pagamento id %d já está APROVADO e não pode ser alterado", id)
                  );
              }
              Pagamento pagamento = pagamentoRepository.getReferenceById(id);

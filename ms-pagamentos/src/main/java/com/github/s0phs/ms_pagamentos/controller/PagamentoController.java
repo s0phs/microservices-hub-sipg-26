@@ -2,6 +2,7 @@ package com.github.s0phs.ms_pagamentos.controller;
 
 import com.github.s0phs.ms_pagamentos.dto.PagamentoDTO;
 import com.github.s0phs.ms_pagamentos.service.PagamentoService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +68,7 @@ public class PagamentoController {
 
     //Patch faz uma modificação parcial, diferente do Put que faz uma substituição total
     @PatchMapping("/{id}/confirmar")
+    @CircuitBreaker(name = "atualizarPedido", fallbackMethod = "fallbackConfirmarPagamentoPendente")
     public ResponseEntity<PagamentoDTO> confirmarPagamentoDoPedido(@PathVariable @NotNull Long id) {
 
         PagamentoDTO dto = pagamentoService.confirmarPagamentoDoPedido(id);
