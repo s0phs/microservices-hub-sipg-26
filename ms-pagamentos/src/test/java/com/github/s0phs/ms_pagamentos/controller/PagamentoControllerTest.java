@@ -1,7 +1,8 @@
 package com.github.s0phs.ms_pagamentos.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.s0phs.ms_pagamentos.dto.PagamentoDTO;
+import com.github.s0phs.ms_pagamentos.dto.PagamentoRequestDTO;
+import com.github.s0phs.ms_pagamentos.dto.PagamentoResponseDTO;
 import com.github.s0phs.ms_pagamentos.entities.Pagamento;
 import com.github.s0phs.ms_pagamentos.exceptions.ResourceNotFoundException;
 import com.github.s0phs.ms_pagamentos.service.PagamentoService;
@@ -15,8 +16,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-
-import javax.print.attribute.standard.Media;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,8 +53,8 @@ public class PagamentoControllerTest {
     @Test
     void findAllPagamentosShouldReturnListPagamentosDTOAnd200() throws Exception {
          //Arrange
-        PagamentoDTO inputDto = new PagamentoDTO(pagamento);
-        List<PagamentoDTO> list = List.of(inputDto);
+        PagamentoResponseDTO inputDto = new PagamentoResponseDTO(pagamento);
+        List<PagamentoResponseDTO> list = List.of(inputDto);
         Mockito.when(pagamentoService.findAllPagamentos()).thenReturn(list);
 
         //Act + Assert
@@ -78,12 +77,12 @@ public class PagamentoControllerTest {
     @Test
     void createPagamentoShouldReturn201WhenValid() throws Exception {
 
-        PagamentoDTO requestDTO = new PagamentoDTO(Factory.createPagamentoSemId());
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(Factory.createPagamentoSemId());
         //Bean objectMapper para converter JAVA para JSON
 
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
-        PagamentoDTO responseDTO = new PagamentoDTO(pagamento);
-        Mockito.when(pagamentoService.savePagamento(any(PagamentoDTO.class))).thenReturn(responseDTO);
+        PagamentoResponseDTO responseDTO = new PagamentoResponseDTO(pagamento);
+        Mockito.when(pagamentoService.savePagamento(any(PagamentoRequestDTO.class))).thenReturn(responseDTO);
 
         mockMvc.perform(post("/pagamentos")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -97,7 +96,7 @@ public class PagamentoControllerTest {
                 .andExpect(jsonPath("$.valor").value(pagamento.getValor().doubleValue()))
                 .andExpect(jsonPath("$.pedidoId").value(pagamento.getPedidoId()));
 
-        Mockito.verify(pagamentoService).savePagamento(any(PagamentoDTO.class));
+        Mockito.verify(pagamentoService).savePagamento(any(PagamentoRequestDTO.class));
         Mockito.verifyNoMoreInteractions(pagamentoService);
     }
 
@@ -128,7 +127,7 @@ public class PagamentoControllerTest {
     @Test
     void findPagamentoByIdShouldReturn200WhenIdExists() throws Exception{
 
-        PagamentoDTO responseDTO = new PagamentoDTO(pagamento);
+        PagamentoResponseDTO responseDTO = new PagamentoResponseDTO(pagamento);
         Mockito.when(pagamentoService.findPagamentoById(existingId)).thenReturn(responseDTO);
 
         mockMvc.perform(get("/pagamentos/{id}", existingId)
@@ -168,11 +167,11 @@ public class PagamentoControllerTest {
         pagamentoInvalido.setValor(BigDecimal.valueOf(0));
         pagamentoInvalido.setNome(null);
 
-        PagamentoDTO requestDTO = new PagamentoDTO(pagamentoInvalido);
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(pagamentoInvalido);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
-        PagamentoDTO responseDTO = new PagamentoDTO(pagamentoInvalido);
+        PagamentoResponseDTO responseDTO = new PagamentoResponseDTO(pagamentoInvalido);
 
-        Mockito.when(pagamentoService.savePagamento(any(PagamentoDTO.class))).thenReturn(responseDTO);
+        Mockito.when(pagamentoService.savePagamento(any(PagamentoRequestDTO.class))).thenReturn(responseDTO);
 
         mockMvc.perform(post("/pagamentos")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -187,10 +186,10 @@ public class PagamentoControllerTest {
     @Test
     void updatePagamentoShouldReturn200WhenValid() throws Exception {
 
-        PagamentoDTO requestDTO = new PagamentoDTO(Factory.createPagamento());
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(Factory.createPagamento());
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
-        PagamentoDTO responseDTO = new PagamentoDTO(pagamento);
-        Mockito.when(pagamentoService.updatePagamento(eq(existingId), any(PagamentoDTO.class)))
+        PagamentoResponseDTO responseDTO = new PagamentoResponseDTO(pagamento);
+        Mockito.when(pagamentoService.updatePagamento(eq(existingId), any(PagamentoRequestDTO.class)))
                                 .thenReturn(responseDTO);
 
         mockMvc.perform(put("/pagamentos/{id}", existingId)
@@ -204,7 +203,7 @@ public class PagamentoControllerTest {
                 .andExpect(jsonPath("$.status").value(pagamento.getStatus().name()))
                 .andExpect(jsonPath("$.pedidoId").value(pagamento.getPedidoId()));
 
-        Mockito.verify(pagamentoService).updatePagamento(eq(existingId), any(PagamentoDTO.class));
+        Mockito.verify(pagamentoService).updatePagamento(eq(existingId), any(PagamentoRequestDTO.class));
         Mockito.verifyNoMoreInteractions(pagamentoService);
     }
 
@@ -215,7 +214,7 @@ public class PagamentoControllerTest {
         Pagamento pagamentoInvalido = Factory.createPagamento();
         pagamentoInvalido.setValor(BigDecimal.ZERO);
         pagamentoInvalido.setNome(null);
-        PagamentoDTO requestDTO = new PagamentoDTO(pagamentoInvalido);
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(pagamentoInvalido);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(put("/pagamentos/{id}", existingId)
@@ -231,10 +230,10 @@ public class PagamentoControllerTest {
     @Test
     void updatePagamentoShouldReturn404WhenIdDoesNotExists() throws Exception {
 
-        PagamentoDTO requestDTO = new PagamentoDTO(pagamento);
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(pagamento);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
-        Mockito.when(pagamentoService.updatePagamento(eq(nonExistingId), any(PagamentoDTO.class)))
+        Mockito.when(pagamentoService.updatePagamento(eq(nonExistingId), any(PagamentoRequestDTO.class)))
                 .thenThrow(new ResourceNotFoundException("Recurso não encontrado. ID:" + nonExistingId));
 
         mockMvc.perform(put("/pagamentos/{id}", nonExistingId)
@@ -245,7 +244,7 @@ public class PagamentoControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
-        Mockito.verify(pagamentoService).updatePagamento(eq(nonExistingId), any(PagamentoDTO.class));
+        Mockito.verify(pagamentoService).updatePagamento(eq(nonExistingId), any(PagamentoRequestDTO.class));
         Mockito.verifyNoMoreInteractions(pagamentoService);
     }
 

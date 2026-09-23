@@ -1,6 +1,7 @@
 package com.github.s0phs.ms.pedidos.controller;
 
-import com.github.s0phs.ms.pedidos.dto.PedidoDTO;
+import com.github.s0phs.ms.pedidos.dto.PedidoRequestDTO;
+import com.github.s0phs.ms.pedidos.dto.PedidoResponseDTO;
 import com.github.s0phs.ms.pedidos.services.PedidoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,23 +27,23 @@ public class PedidoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PedidoDTO>> getAllPedidos(){
+    public ResponseEntity<List<PedidoResponseDTO>> getAllPedidos(){
 
-        List<PedidoDTO> pedidos = pedidoService.findAllPedidos();
+        List<PedidoResponseDTO> pedidos = pedidoService.findAllPedidos();
         return ResponseEntity.ok(pedidos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoDTO> getPedido(@PathVariable Long id){
+    public ResponseEntity<PedidoResponseDTO> getPedido(@PathVariable Long id){
 
-        PedidoDTO pedidoDTO = pedidoService.findPedidoById(id);
+        PedidoResponseDTO pedidoDTO = pedidoService.findPedidoById(id);
         return ResponseEntity.ok(pedidoDTO);
     }
 
     @PostMapping
-    public ResponseEntity<PedidoDTO> createPedido(@RequestBody @Valid PedidoDTO pedidoDTO){
+    public ResponseEntity<PedidoResponseDTO> createPedido(@RequestBody @Valid PedidoRequestDTO inputDTO){
 
-        pedidoDTO = pedidoService.savePedido(pedidoDTO);
+        PedidoResponseDTO pedidoDTO = pedidoService.savePedido(inputDTO);
 
         URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -54,10 +55,10 @@ public class PedidoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PedidoDTO> updatePedido(@PathVariable Long id,
-                                                  @RequestBody @Valid PedidoDTO pedidoDTO){
+    public ResponseEntity<PedidoResponseDTO> updatePedido(@PathVariable Long id,
+                                                          @RequestBody @Valid PedidoRequestDTO inputDTO){
 
-        pedidoDTO = pedidoService.updatePedido(id, pedidoDTO);
+        PedidoResponseDTO pedidoDTO = pedidoService.updatePedido(id, inputDTO);
 
         return ResponseEntity.ok(pedidoDTO);
     }

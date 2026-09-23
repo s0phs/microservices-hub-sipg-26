@@ -13,22 +13,17 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class ItemDoPedidoDTO {
+public class ItemDoPedidoResponseDTO {
 
     private Long id;
 
-    @NotNull(message = "Quantidade requerido")
-    @Positive(message = "Quantidade deve ser um número positivo")
     private Integer quantidade;
 
-    @NotBlank(message = "Descrição requerido")
     private String descricao;
 
-    @NotNull(message = "Preço unitário é requerido")
-    @Positive(message = "O preço unitário deve ser um valor positivo e maior que zero")
     private BigDecimal precoUnitario;
 
-    public ItemDoPedidoDTO(ItemDoPedido itemDoPedido){
+    public ItemDoPedidoResponseDTO(ItemDoPedido itemDoPedido){
         id = itemDoPedido.getId();
         quantidade = itemDoPedido.getQuantidade();
         descricao = itemDoPedido.getDescricao();

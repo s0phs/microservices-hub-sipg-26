@@ -1,7 +1,8 @@
 package com.github.s0phs.ms_pagamentos.service;
 
 import com.github.s0phs.ms_pagamentos.client.PedidoClient;
-import com.github.s0phs.ms_pagamentos.dto.PagamentoDTO;
+import com.github.s0phs.ms_pagamentos.dto.PagamentoRequestDTO;
+import com.github.s0phs.ms_pagamentos.dto.PagamentoResponseDTO;
 import com.github.s0phs.ms_pagamentos.entities.Pagamento;
 import com.github.s0phs.ms_pagamentos.entities.Status;
 import com.github.s0phs.ms_pagamentos.exceptions.PagamentoAprovadoException;
@@ -26,24 +27,24 @@ public class PagamentoService {
     private PedidoClient pedidoClient;
 
     @Transactional(readOnly = true)
-    public List<PagamentoDTO> findAllPagamentos(){
+    public List<PagamentoResponseDTO> findAllPagamentos(){
         List<Pagamento> pagamentos = pagamentoRepository.findAll();
 
-        return pagamentos.stream().map(PagamentoDTO::new).toList();
+        return pagamentos.stream().map(PagamentoResponseDTO::new).toList();
     }
 
     @Transactional(readOnly = true)
-    public PagamentoDTO findPagamentoById(Long id){
+    public PagamentoResponseDTO findPagamentoById(Long id){
 
         Pagamento pagamento = pagamentoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Recurso não encontrado. ID: " + id)
         );
 
-        return new PagamentoDTO(pagamento);
+        return new PagamentoResponseDTO(pagamento);
     }
 
     @Transactional
-    public PagamentoDTO savePagamento(PagamentoDTO pagamentoDTO){
+    public PagamentoResponseDTO savePagamento(PagamentoRequestDTO pagamentoDTO){
         Pagamento pagamento = new Pagamento();
 
         copyDtoToPagamento(pagamentoDTO, pagamento);
@@ -51,10 +52,10 @@ public class PagamentoService {
         pagamento.setStatus(Status.CRIADO);
         pagamento = pagamentoRepository.save(pagamento);
 
-        return new PagamentoDTO(pagamento);
+        return new PagamentoResponseDTO(pagamento);
     }
 
-    private void copyDtoToPagamento(PagamentoDTO pagamentoDTO, Pagamento pagamento) {
+    private void copyDtoToPagamento(PagamentoRequestDTO pagamentoDTO, Pagamento pagamento) {
 
         pagamento.setValor(pagamentoDTO.getValor());
         pagamento.setNome(pagamentoDTO.getNome());
@@ -65,20 +66,14 @@ public class PagamentoService {
     }
 
     @Transactional
-    public PagamentoDTO updatePagamento( Long id, PagamentoDTO pagamentoDTO){
+    public PagamentoResponseDTO updatePagamento(Long id, PagamentoRequestDTO pagamentoDTO){
          try {
-
-             if (pagamentoDTO.getStatus().equals(Status.APROVADO)){
-                 throw new PagamentoAprovadoException(
-                         String.format("Pagamento id %d já está APROVADO e não pode ser alterado", id)
-                 );
-             }
              Pagamento pagamento = pagamentoRepository.getReferenceById(id);
+
              copyDtoToPagamento(pagamentoDTO, pagamento);
-             pagamento.setStatus(pagamentoDTO.getStatus());
              pagamento = pagamentoRepository.save(pagamento);
 
-             return new PagamentoDTO(pagamento);
+             return new PagamentoResponseDTO(pagamento);
 
          }catch (EntityNotFoundException e) {
              throw new ResourceNotFoundException("Recurso não encontrado. ID: " + id);
@@ -97,7 +92,7 @@ public class PagamentoService {
 
     ////////////////////////////////////////
     @Transactional
-    public PagamentoDTO confirmarPagamentoDoPedido(Long id){
+    public PagamentoResponseDTO confirmarPagamentoDoPedido(Long id){
         Pagamento pagamento = pagamentoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Recurso não encontrado. ID: " + id)
         );
@@ -114,12 +109,12 @@ public class PagamentoService {
             //outros erros (400/500/timeout etc.)
             throw new RuntimeException("Falha ao comunicar com ms-pedidos", e);
         }
-        return new PagamentoDTO(pagamento);
+        return new PagamentoResponseDTO(pagamento);
     }
 
     ///////////////////////////////////
     @Transactional
-    public PagamentoDTO alterarStatusDoPagamento(Long id) {
+    public PagamentoResponseDTO alterarStatusDoPagamento(Long id) {
 
         Pagamento pagamento = pagamentoRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Pagamento não encontrado. ID:" + id)
@@ -128,6 +123,6 @@ public class PagamentoService {
         pagamento.setStatus(Status.CONFIRMACAO_PENDENTE);
         pagamento = pagamentoRepository.save(pagamento);
 
-        return new PagamentoDTO(pagamento);
+        return new PagamentoResponseDTO(pagamento);
     }
 }

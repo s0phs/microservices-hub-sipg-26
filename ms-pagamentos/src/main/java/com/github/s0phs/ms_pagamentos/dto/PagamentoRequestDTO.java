@@ -1,7 +1,5 @@
 package com.github.s0phs.ms_pagamentos.dto;
 
-import com.github.s0phs.ms_pagamentos.entities.Pagamento;
-import com.github.s0phs.ms_pagamentos.entities.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -15,9 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class PagamentoDTO {
-
-    private Long id;
+public class PagamentoRequestDTO {
 
     @NotNull(message = "O campo valor é requerido")
     @Positive(message = "O valor do pagamento deve ser um número positivo")
@@ -39,19 +35,16 @@ public class PagamentoDTO {
     @Size(min = 3, max = 3, message = "Código de segurança deve ter 3 caracteres")
     private String codigoSeguranca;
 
-    private Status status;
-
     @NotNull(message = "O campo ID do pedido é requerido")
     private Long pedidoId;
 
-    public PagamentoDTO(Pagamento pagamento) {
-        id = pagamento.getId();
-        valor = pagamento.getValor();
-        nome = pagamento.getNome();
-        numeroCartao = pagamento.getNumeroCartao();
-        validade = pagamento.getValidade();
-        codigoSeguranca = pagamento.getCodigoSeguranca();
-        status = pagamento.getStatus();
-        pedidoId = pagamento.getPedidoId();
-    }
+//    public PagamentoRequestDTO(Pagamento pagamento) {
+//
+//        valor = pagamento.getValor();
+//        nome = pagamento.getNome();
+//        numeroCartao = pagamento.getNumeroCartao();
+//        validade = pagamento.getValidade();
+//        codigoSeguranca = pagamento.getCodigoSeguranca();
+//        pedidoId = pagamento.getPedidoId();
+//    }
 }

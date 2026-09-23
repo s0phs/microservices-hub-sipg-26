@@ -2,7 +2,7 @@ package com.github.s0phs.ms_pagamentos.controller;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.s0phs.ms_pagamentos.dto.PagamentoDTO;
+import com.github.s0phs.ms_pagamentos.dto.PagamentoResponseDTO;
 import com.github.s0phs.ms_pagamentos.entities.Pagamento;
 import com.github.s0phs.ms_pagamentos.tests.Factory;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.print.attribute.standard.Media;
 import java.math.BigDecimal;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -85,7 +84,7 @@ public class PagamentoControllerIT {
     @Test
     void createPagamentoShouldReturn201WhenValid() throws Exception {
 
-        PagamentoDTO requestDTO = new PagamentoDTO(Factory.createPagamentoSemId());
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(Factory.createPagamentoSemId());
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(post("/pagamentos")
@@ -105,7 +104,7 @@ public class PagamentoControllerIT {
         Pagamento pagamentoInvalido = Factory.createPagamentoSemId();
         pagamentoInvalido.setValor(BigDecimal.valueOf(0));
         pagamentoInvalido.setNome(null);
-        PagamentoDTO requestDTO = new PagamentoDTO(pagamentoInvalido);
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(pagamentoInvalido);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(post("/pagamentos")
@@ -122,7 +121,7 @@ public class PagamentoControllerIT {
     void updatePagamentoShouldReturn200WhenIdExists() throws Exception {
 
         pagamento = Factory.createPagamento();
-        PagamentoDTO requestDTO = new PagamentoDTO(pagamento);
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(pagamento);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(put("/pagamentos/{id}", existingId)
@@ -141,7 +140,7 @@ public class PagamentoControllerIT {
         pagamento = Factory.createPagamento();
 
         pagamento.setValor(BigDecimal.valueOf(500.0));
-        PagamentoDTO requestDTO = new PagamentoDTO(pagamento);
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(pagamento);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(put("/pagamentos/{id}", existingId)
@@ -163,7 +162,7 @@ public class PagamentoControllerIT {
         pagamento.setNome(null);
         pagamento.setValor(BigDecimal.valueOf(-32.05));
         pagamento.setPedidoId(null);
-        PagamentoDTO requestDTO = new PagamentoDTO(pagamento);
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(pagamento);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(put("/pagamentos/{id}", existingId)
@@ -179,7 +178,7 @@ public class PagamentoControllerIT {
     @Test
     void updatePagamentoShouldReturn404WhenIdDoesNotExist() throws Exception {
         pagamento = Factory.createPagamento();
-        PagamentoDTO requestDTO = new PagamentoDTO(pagamento);
+        PagamentoResponseDTO requestDTO = new PagamentoResponseDTO(pagamento);
         String jsonRequestBody = objectMapper.writeValueAsString(requestDTO);
 
         mockMvc.perform(put("/pagamentos/{id}", nonExistingId)
